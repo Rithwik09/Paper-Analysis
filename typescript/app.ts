@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
-import userRoutes from "./routes/userRoutes";
-import pdfRoutes from "./routes/paperRoutes";
+import userRoutes from "./src/routes/userRoutes";
+import pdfRoutes from "./src/routes/paperRoutes";
 
 dotenv.config();
 const app = express();

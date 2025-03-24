@@ -3,7 +3,7 @@ import multer from "multer";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import FormData from "form-data"; // Import FormData
+import FormData from "form-data"; 
 
 // Configure Multer for file uploads
 const upload = multer({ dest: "uploads/" });
@@ -18,23 +18,18 @@ export const qPaperUpload = async (req: MulterRequest, res: Response): Promise<v
         if (!req.file) {
             res.status(400).json({ message: "No file uploaded" });
         }
-
         const filePath = path.resolve(req.file.path);
-
         // Prepare FormData to send file to Python backend
         const formData = new FormData();
         formData.append("pdf", fs.createReadStream(filePath));
-
         // Send file to Python backend
         const response = await axios.post("http://localhost:5000/analyze", formData, {
             headers: {
                 ...formData.getHeaders(), // Set correct headers for multipart/form-data
             },
         });
-
         // Delete the uploaded file after sending
         fs.unlinkSync(filePath);
-
         // Send Python's response back to the frontend
         res.json(response.data);
     } catch (error) {
