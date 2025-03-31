@@ -13,3 +13,10 @@ Next steps:
 
 More information in our documentation:
 https://pris.ly/d/getting-started
+
+
+run python main:
+uvicorn main:app --host 0.0.0.0 --port 5000 --reload
+
+run typescript:
+npm run dev 
