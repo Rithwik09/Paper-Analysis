@@ -47,6 +47,7 @@ export const qPaperUpload = async (req: MulterRequest, res: Response): Promise<v
 
         // Send Python's response back to the frontend
         res.json(response.data);
+        console.log("Response from Python backend:", response.data);
     } catch (error) {
         console.error("Error sending file to Python backend:", error);
         res.status(500).json({ message: "Error processing file" });

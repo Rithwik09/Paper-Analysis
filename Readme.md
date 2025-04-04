@@ -15,6 +15,13 @@ More information in our documentation:
 https://pris.ly/d/getting-started
 
 
+**Recreate the Environment on Another Machine**
+
+- python -m venv .venv
+
+- .venv\Scripts\activate     # On Windows
+- pip install -r requirements.txt
+
 run python main:
 uvicorn main:app --host 0.0.0.0 --port 5000 --reload
 
