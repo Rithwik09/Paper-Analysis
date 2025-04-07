@@ -20,7 +20,6 @@ import os
 import fitz  # PyMuPDF
 from pdfminer.high_level import extract_text
 import nltk
-from transformers import pipeline
 
 # Ensure uploads directory exists
 UPLOAD_FOLDER = "uploads"
@@ -28,32 +27,46 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Download necessary NLTK resources
 nltk.download("punkt")
+nltk.download('punkt_tab')
 nltk.download("stopwords")
 
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
+from collections import defaultdict
 
 stop_words = set(stopwords.words("english"))
 
-# # Optional: Load Hugging Face transformer model for text summarization
-ls
+def clean_text(text):
+    tokens = word_tokenize(text)
+    return [word for word in tokens if word.isalpha() and word.lower() not in stop_words]
 
+def summarize_text(text, max_sentences=5):
+    sentences = sent_tokenize(text)
+    word_freq = defaultdict(int)
 
-# Use a smaller model instead of facebook/bart-large-cnn
-text_cleaner = pipeline("text2text-generation", model="sshleifer/distilbart-cnn-12-6")
+    for word in clean_text(text):
+        word_freq[word.lower()] += 1
+
+    # Score sentences
+    sentence_scores = {}
+    for sent in sentences:
+        for word in word_tokenize(sent.lower()):
+            if word in word_freq:
+                sentence_scores[sent] = sentence_scores.get(sent, 0) + word_freq[word]
+
+    # Sort and pick top sentences
+    summarized = sorted(sentence_scores, key=sentence_scores.get, reverse=True)[:max_sentences]
+    return " ".join(summarized)
 
 async def analyze_file(pdf: UploadFile = File(...)):
-    """Uploads a PDF, extracts text using PyMuPDF & PDFMiner, and cleans it using NLP."""
     file_path = os.path.join(UPLOAD_FOLDER, pdf.filename)
 
-    # Save the file
     try:
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(pdf.file, buffer)
     except Exception as e:
         return {"error": str(e)}
 
-    # Extract text using PyMuPDF
     try:
         text = ""
         doc = fitz.open(file_path)
@@ -62,25 +75,15 @@ async def analyze_file(pdf: UploadFile = File(...)):
     except Exception:
         text = ""
 
-    # If PyMuPDF fails, use PDFMiner
     if not text.strip():
         text = extract_text(file_path)
 
     if not text.strip():
         return {"error": "Unable to extract text from PDF"}
 
-    # Clean text using NLTK
-    def clean_text(text):
-        tokens = word_tokenize(text)
-        cleaned_words = [word for word in tokens if word.isalpha() and word.lower() not in stop_words]
-        return " ".join(cleaned_words)
-
-    cleaned_text = clean_text(text)
-
-    # (Optional) Further summarize using Hugging Face model
-    summarized_text = text_cleaner(cleaned_text, max_length=300, min_length=50, do_sample=False)[0]["summary_text"]
+    summarized_text = summarize_text(text)
 
     return {
         "filename": pdf.filename,
-        "extracted_text": summarized_text[:1000],  # Preview first 1000 chars
+        "extracted_text": summarized_text[:1000],  # First 1000 chars
     }

@@ -18,8 +18,8 @@ https://pris.ly/d/getting-started
 **Recreate the Environment on Another Machine**
 
 - python -m venv .venv
-
-- .venv\Scripts\activate     # On Windows
+# open src then run source active to activate Venv
+- source venv/Scripts/activate  # On Windows
 - pip install -r requirements.txt
 
 run python main:
