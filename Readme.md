@@ -21,9 +21,9 @@ https://pris.ly/d/getting-started
 # open src then run source active to activate Venv
 - source venv/Scripts/activate  # On Windows
 - pip install -r requirements.txt
-
+uvicorn main:app --host 0.0.0.0 --port 5000
 run python main:
-uvicorn main:app --host 0.0.0.0 --port 5000 --reload
+ --reload
 
 run typescript:
 npm run dev 
