@@ -7,6 +7,9 @@ import nltk
 import re
 from collections import defaultdict
 
+from models.questionpaper import QuestionPaper, QuestionBlockSchema, QuestionSchema, OptionSchema
+from models.vector_metadata import QuestionVectorMetadata
+
 # Setup
 
 nltk.download("punkt")
@@ -14,6 +17,7 @@ nltk.download("stopwords")
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 # --------- Text Utilities ---------
 def extract_directions(text):

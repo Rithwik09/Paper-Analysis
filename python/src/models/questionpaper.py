@@ -29,5 +29,6 @@ class QuestionPaper(Document):
     total_questions: int
     question_blocks: List[QuestionBlockSchema]
 
-    class Settings:
+class Settings:
         name = "questionpapers"  # collection name in MongoDB
+    
